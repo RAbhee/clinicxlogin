@@ -1,10 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
 import 'Configfile.dart';
 import 'Superadmin/Dashboard.dart';
 import 'Superadmin/Forgot_password.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
@@ -49,80 +56,112 @@ class MyApp extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.only(left: 500.0),
+          padding: const EdgeInsets.all(20.0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center, // Align children to the end (right side)
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Adjust spacing between elements
-              Container(
-                width: 500,
-                height: 800,// Adjust the width as needed
-                padding: EdgeInsets.only(top: 100.0,),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color.fromRGBO(133, 189, 215, 0.878),
-                      blurRadius: 30.0,
-                      offset: Offset(0, 30),
-                      spreadRadius: -20.0,
-                    ),
-                  ],
-                  gradient: LinearGradient(
-                    colors: [Colors.white, Color.fromRGBO(244, 247, 251, 1)],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                  border: Border.all(color: Colors.white, width: 5.0),
-                ),
-                child: Column(
-                  children: [
-                    Image.asset(
-                      AppConfig.image2Path,
-                      width: 150,
-                      height: 100,
-                    ), // Logo image
-                    SizedBox(height: 10.0),
-                    Text(
-                      'Sign In',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 25.0,
-                        color: Colors.blue.shade900,
+              Image.asset(
+                AppConfig.image5Path, // Replace with your image path
+                width: 600,
+                height: double.infinity, // Match the height of the container
+                fit: BoxFit.cover, // Adjust how the image fits the space
+              ),
+              SizedBox(width: 20,),
+              // Container with sign-in content
+              SingleChildScrollView(
+                child: Container(
+                  width: 700,
+                  height: 800,
+                  padding: EdgeInsets.all(5.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromRGBO(133, 189, 215, 0.878),
+                        blurRadius: 30.0,
+                        offset: Offset(0, 30),
+                        spreadRadius: -20.0,
                       ),
+                    ],
+                    gradient: LinearGradient(
+                      colors: [Colors.white, Color.fromRGBO(244, 247, 251, 1)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
                     ),
-                    SizedBox(height: 20.0),
-                    FormWidget(), // Your Sign In Form Widget
-                    SizedBox(height: 20.0),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => RegisterScreen()),
-                        );
-                      },
-                      child: Text(
-                        'Don\'t have an account? Register here',
+                    border: Border.all(color: Colors.white, width: 5.0),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text("Powered by",style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w700
+                          ),),
+                          SizedBox(width: 5,),
+                          Image.asset(
+                            AppConfig.image4Path, // Image above image2Path
+                            width: 150,
+                            height: 100,
+                          ),
+                        ],
+                      ),
+                      Image.asset(
+                        AppConfig.image2Path,
+                        width: 150,
+                        height: 100,
+                      ), // Logo image
+                      SizedBox(height: 5.0),
+                      Text(
+                        'Sign In',
                         style: TextStyle(
-                          color: Colors.blue,
-                          decoration: TextDecoration.underline,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25.0,
+                          color: Colors.blue.shade900,
                         ),
                       ),
-                    ),
-                    SizedBox(height: 20.0),
-                    Image.asset(
-                      AppConfig.image1Path,
-                    ),
-                  ],
+                      SizedBox(height: 10.0),
+                      FormWidget(), // Your Sign In Form Widget
+                      SizedBox(height: 10.0),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => RegisterScreen()),
+                          );
+                        },
+                        child: Text(
+                          'Don\'t have an account? Register here',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 2.0),
+                      Image.asset(
+                        AppConfig.image1Path,
+                        height: 160,
+                        width: 230,
+                      ),
+                    ],
+                  ),
                 ),
               ),
+              // Image on the other side
             ],
           ),
         ),
       ),
     );
   }
+
+
+
 
 
 
@@ -205,6 +244,8 @@ class _FormWidgetState extends State<FormWidget> with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
   final _formKey = GlobalKey<FormState>(); // Key for the Form widget
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
 
   @override
   void initState() {
@@ -228,6 +269,8 @@ class _FormWidgetState extends State<FormWidget> with TickerProviderStateMixin {
   @override
   void dispose() {
     _controller.dispose();
+    _emailController.dispose(); // Dispose the controllers
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -240,6 +283,7 @@ class _FormWidgetState extends State<FormWidget> with TickerProviderStateMixin {
         child: Column(
           children: [
             TextFormField(
+              controller: _emailController, // Assign controller to email field
               decoration: InputDecoration(
                 labelText: 'E-mail',
                 filled: true,
@@ -263,6 +307,7 @@ class _FormWidgetState extends State<FormWidget> with TickerProviderStateMixin {
             ),
             SizedBox(height: 20.0),
             TextFormField(
+              controller: _passwordController, // Assign controller to password field
               decoration: InputDecoration(
                 labelText: 'Password',
                 filled: true,
@@ -319,12 +364,11 @@ class _FormWidgetState extends State<FormWidget> with TickerProviderStateMixin {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 15.0),
+                padding: EdgeInsets.symmetric(vertical: 15.0), backgroundColor: Colors.purple,
                 minimumSize: Size(double.infinity, 50), // Set the width to match_parent and height to 50
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.0),
-                ),
-                primary: Colors.purple, // Change the background color of the button
+                ), // Change the background color of the button
               ),
             ),
           ],
@@ -346,18 +390,61 @@ class _FormWidgetState extends State<FormWidget> with TickerProviderStateMixin {
   }
 
   // Function to handle form submission
-  // Function to handle form submission
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      // Form is valid, navigate to SuperadminScreen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => SubmitScreen()),
-      );
+      try {
+        // Sign in with email and password
+        UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+
+        // Check if the user is a superadmin
+        bool isSuperadmin = await _checkSuperadminCredentials(userCredential.user!);
+
+        if (isSuperadmin) {
+          // Navigate to the dashboard for superadmins
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => SubmitScreen()),
+          );
+        } else {
+          // Not a superadmin, show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Invalid credentials for superadmin access.'),
+            ),
+          );
+        }
+      } catch (e) {
+        // Handle sign-in errors
+        print('Error: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Invalid email or password. Please try again.'),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<bool> _checkSuperadminCredentials(User user) async {
+    // Get the superadmin document from Firestore
+    DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
+        .collection('super_admins')
+        .doc(user.email)
+        .get();
+
+    if (snapshot.exists) {
+      // Check if the email and password match the stored credentials
+      return snapshot.get('password') == _passwordController.text;
+    } else {
+      return false; // Superadmin document not found
     }
   }
 
 }
+
 
 class RegisterScreen extends StatelessWidget {
   @override
