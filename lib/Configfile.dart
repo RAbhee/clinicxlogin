@@ -8,6 +8,4 @@ class AppConfig {
   static const String image4Path = 'assets/images/Matricallogo.png';
   static const String image6Path = 'assets/images/password.jpg';
 
-  static const String message1 = 'Welcome to MyApp!';
-  static const String message2 = 'Thank you for using MyApp!';
 }
