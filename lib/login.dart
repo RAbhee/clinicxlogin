@@ -175,8 +175,11 @@ class MyApp extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(AppConfig.image2Path, width: 100, height: 150), // Logo image
-              SizedBox(height: 10.0),
+              Image.asset(
+                  AppConfig.image2Path,
+                  width: 100,
+                  height: 150
+              ), // Logo image
               Text(
                 'Sign In',
                 style: TextStyle(
@@ -213,6 +216,7 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
+
 }
 
 // FormWidget and its dependencies
@@ -387,6 +391,7 @@ class _FormWidgetState extends State<FormWidget> with TickerProviderStateMixin {
     return passwordRegex.hasMatch(password);
   }
   // Function to handle form submission
+  // Function to handle form submission
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       try {
@@ -396,23 +401,11 @@ class _FormWidgetState extends State<FormWidget> with TickerProviderStateMixin {
           password: _passwordController.text,
         );
 
-        // Check if the user is a superadmin
-        bool isSuperadmin = await _checkSuperadminCredentials(userCredential.user!);
-
-        if (isSuperadmin) {
-          // Navigate to the dashboard for superadmins
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => SubmitScreen()),
-          );
-        } else {
-          // Not a superadmin, show error message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Invalid credentials for superadmin access.'),
-            ),
-          );
-        }
+        // Navigate to the dashboard for authenticated users
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => SubmitScreen()),
+        );
       } catch (e) {
         // Handle sign-in errors
         print('Error: $e');
@@ -424,49 +417,5 @@ class _FormWidgetState extends State<FormWidget> with TickerProviderStateMixin {
       }
     }
   }
-
-  Future<bool> _checkSuperadminCredentials(User user) async {
-    try {
-      DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
-          .collection('super_admins')
-          .doc(user.email)
-          .get();
-
-      if (snapshot.exists) {
-        String storedPassword = snapshot.get('password');
-        print('Stored Password: $storedPassword'); // Log the stored password
-
-
-
-        if (storedPassword == _passwordController.text) {
-          print('Credentials Matched'); // Log when credentials match
-          return true;
-        } else {
-          print('Invalid Password'); // Log if password is invalid
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Invalid password. Please try again.'),
-            ),
-          );
-          return false;
-        }
-      } else {
-        print('Superadmin document not found'); // Log if superadmin document not found
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Superadmin document not found.'),
-          ),
-        );
-        return false;
-      }
-    } catch (e) {
-      print('Error checking credentials: $e'); // Log any errors
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('An error occurred. Please try again later.'),
-        ),
-      );
-      return false;
-    }
-  }
 }
+

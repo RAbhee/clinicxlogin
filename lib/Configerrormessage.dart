@@ -9,4 +9,5 @@ class AppMessages  {
   static const String waitingerror = 'please wait until super admin approves the registration';
   static const String declinederror = 'your registration status is Declined please contact administrator';
   static const String Inactiveerror = 'your registration status is Inactive please contact administrator';
+
 }
